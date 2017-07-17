@@ -8,15 +8,15 @@ library(tidyr)
 refine_original <- read_csv("~/Github/Springboard_Foundations_Data-Refine_01/refine_original.csv")
 View(refine_original)
 
-#change row name data manually by specific row
-refine_original[1:6,1] <- "philips"
-refine_original[7:13,1] <- "akzo"
-refine_original[14:16,1] <- "philips"
-refine_original[22:25,1] <- "unilever"
-
-#sort alphabetically by company nameproduct
+#sort alphabetically by company name
 refine_original <- refine_original %>% 
   arrange(company)
+
+#change row name data manually by specific row (this needs to be completed algorithmically versus manually)
+refine_original[8:16,1] <- "philips"
+refine_original[1:7,1] <- "akzo"
+refine_original[21:25,1] <- "van houten"
+refine_original[17:20,1] <- "unilever"
 
 #separate "Product code / number" column into product_code and product number and remove it aftewards
 refine_original <- refine_original %>% 
@@ -29,3 +29,24 @@ refine_original <- refine_original %>%
   mutate(Laptop = product_code == 'x') %>% 
   mutate(Tablet = product_code == 'q')
 
+#add full address for geocoding separated by commas (but not commas with spaces)
+refine_original <- refine_original %>% 
+  mutate(full_address = paste(address, city, country, sep = ","))
+
+#create dummy variables
+# 1. company
+refine_original <- refine_original %>%
+  mutate(company_akzo = as.numeric(company == 'akzo')) %>% 
+  mutate(company_philips = as.numeric(company == 'philips')) %>% 
+  mutate(company_unilever = as.numeric(company == 'unilever')) %>% 
+  mutate(company_van_houten = as.numeric(company == 'van houten'))
+  
+# 2. product (didn't I already make product categories in this manner?)
+refine_original <- refine_original %>% 
+  mutate(product_smartphone = as.numeric(product_code == 'p')) %>% 
+  mutate(product_tv = as.numeric(product_code == 'v')) %>% 
+  mutate(product_laptop = as.numeric(product_code == 'x')) %>% 
+  mutate(product_tablet = as.numeric(product_code == 'q'))
+
+#output to cleaned data file (.csv)
+write_csv(refine_original, "refine_clean.csv")
